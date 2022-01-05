@@ -1,6 +1,6 @@
 # shell_simul
 
-Written in C, implements a virtual shell program that repeatedly reads commands from the user, interprets them, and translates them into a sequence of actions that likely involve an interaction with the operating system through system calls.
+*Written in C, implements a virtual shell program that repeatedly reads commands from the user, interprets them, and translates them into a sequence of actions that likely involve an interaction with the operating system through system calls.*
 
 ### Features
 
@@ -47,4 +47,4 @@ the Makefile file, a test.txt file was included to conveniently follow along wit
 samples. Feel free to add your own as well!
 
 ### To Run:
-- To run the project file, simply type 'make' into your terminal, which then will provide you with an executable file called 'shell' to run
+- To run the project file, simply type *make* into your terminal, which then will provide you with an executable file called *shell* to run

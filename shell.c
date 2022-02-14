@@ -63,7 +63,7 @@ void pipeSequence(char *args[], int pipesCount,int k)
 	{
 		exit(EXIT_FAILURE);
 	}
-	else if (pid == 0)					// Child Process
+	else if (pid == 0)// Child Process
 	{
 		dup2(fd_multiple,0);
 		if(zone < pipesCount){
@@ -242,17 +242,17 @@ void pipeSequence(char *args[], int pipesCount,int k)
 
 void prompt()
 {
-  char shell[1000];
-   if (getcwd(cwd, sizeof(cwd)) != NULL)
-        {
-          strcpy(shell, "DKim:");
-          strcat(shell, cwd);
-          strcat(shell, ":$ ");
+	  char shell[1000];
+	   if (getcwd(cwd, sizeof(cwd)) != NULL)
+		{
+		  strcpy(shell, "DKim:");
+		  strcat(shell, cwd);
+		  strcat(shell, ":$ ");
 
-          printf("%s", shell);
-        }
-   else
-       perror("getcwd() error");
+		  printf("%s", shell);
+		}
+	   else
+	       perror("getcwd() error");
 
 }
 
@@ -266,75 +266,72 @@ int main(){
 
 void shell(int signal)
 {
-		char command[1024];
-		int flag = 1;
-		printf("\n");
+	char command[1024];
+	int flag = 1;
+	printf("\n");
 
-		do
-		{
-      prompt();
-			scanf("%[^\n]%*c",command);
-			removelastspace(command);
-
-			int pipesCount = 0;
-            int i;
-			for(i = 0; i < strlen(command); i++){
-				if(command[i] == '|'){
-					pipesCount++;			
-				}
+	do
+	{
+      		prompt();
+		scanf("%[^\n]%*c",command);
+		removelastspace(command);
+		
+		int pipesCount = 0;
+      		int i;
+		for(i = 0; i < strlen(command); i++){
+			if(command[i] == '|'){
+				pipesCount++;			
 			}
+		}
 
-			char pipeCommands[pipesCount+1][100];
-			int j = 0, k = 0;
-			for(i = 0; i < strlen(command); i++){
-				if(command[i] == '|'){
-					pipeCommands[j][k-1] = '\0';
-					j++;
-					k = 0;									
-				}
-				else if(command[i] == ' '){
-					pipeCommands[j][k] = '$';
+		char pipeCommands[pipesCount+1][100];
+		int j = 0, k = 0;
+		for(i = 0; i < strlen(command); i++){
+			if(command[i] == '|'){
+				pipeCommands[j][k-1] = '\0';
+				j++;
+				k = 0;									
+			}
+			else if(command[i] == ' '){
+				pipeCommands[j][k] = '$';
+				k++;			
+			}
+			else{
+				pipeCommands[j][k] = command[i];
+				k++;	
+			}			
+		}
+		pipeCommands[j][k]  = '\0';
+		
+		for(i = 0; i < pipesCount+1; i++)
+		{
+			char *args[10];	
+			int k = 0;
+			if(i == 0){
+				args[0]=&pipeCommands[i][0];
+				k++;
+			}
+			unsigned int size = strlen(pipeCommands[i]);
+			for(j = 0; j < size; j++)
+			{
+				if(pipeCommands[i][j] == '$'){
+					pipeCommands[i][j] = '\0';
+					args[k] = &pipeCommands[i][j+1];
 					k++;			
 				}
-				else{
-					pipeCommands[j][k] = command[i];
-					k++;
-	
-				}			
 			}
-			pipeCommands[j][k]  = '\0';
+			args[k] = NULL;
 
-			for(i = 0; i < pipesCount+1; i++)
+			if(strcmp(args[0], "exit") == 0)
 			{
-				char *args[10];	
-				int k = 0;
-				if(i == 0){
-					args[0]=&pipeCommands[i][0];
-					k++;
-				}
-
-				unsigned int size = strlen(pipeCommands[i]);
-				for(j = 0; j < size; j++)
-				{
-					if(pipeCommands[i][j] == '$'){
-							pipeCommands[i][j] = '\0';
-							args[k] = &pipeCommands[i][j+1];
-							k++;			
-					}
-				}
-				args[k] = NULL;
-
-				if(strcmp(args[0], "exit") == 0)
-				{
-					kill(0, SIGKILL);
-					exit(0);
-				}
-
-				pipeSequence(args, pipesCount,k);
-				zone++;
+				kill(0, SIGKILL);
+				exit(0);
 			}
-
-			reset();	
+			
+			pipeSequence(args, pipesCount,k);
+			zone++;
+		}
+		reset();	
 
 	}while(flag == 1);
 }
